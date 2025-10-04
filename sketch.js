@@ -31,11 +31,14 @@ let player = {
 
 //sound and image
 let talkSound;
+let achievementSound;
 let playerImg;
 let npc1Img;
 let wallImg;
 let treeImg;
-let achievementSound;
+let bushImg;
+let fenceImg
+
 
 function preload() {
   talkSound = loadSound('assets/achievement.mp3');  
@@ -43,6 +46,8 @@ function preload() {
   npc1Img = loadImage('assets/stone.png');
   wallImg = loadImage('assets/wall.gif');
   treeImg = loadImage('assets/stump.gif');
+  bushImg = loadImage('assets/bush.gif');
+  fenceImg = loadImage('assets/fence.gif');
 
   // ========= 加载每方向 3 帧图 =========
   anim.down[0]  = loadImage('assets/player_down_0.gif');
@@ -70,16 +75,16 @@ function setup() {
 
   maps[0] = [
     
-    "##########N#########",
-    "#..............T...#",
-    "#..T...............#",
+    "----------N---------",
+    "#BBBBB.........TTTT#",
+    "#TTT.........B.....#",
     "#..................#",
-    "................T...",
+    "....B...........T...",
     "....................",
-    "#..................#",
-    "#....T.............#",
-    "#.............T....#",
-    "#########>>>########",
+    "#............BBBBBB#",
+    "#....T.......TRRRRR#",
+    "#..BB........TRRRRR#",
+    "---------->>--------",
   ];
 
   maps[1] = [
@@ -196,7 +201,21 @@ function drawMap(map) {
        else if (ch === "#") {
         imageMode(CENTER);
         image(treeImg, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
+      } else if (ch === "B") {
+        imageMode(CENTER);
+        image(bushImg, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
       } 
+      else if (ch === "-") {
+        imageMode(CENTER);
+        image(fenceImg, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
+      } 
+      else if (ch === "R") {
+        noStroke();//这里开始没有描边
+        fill(64, 164, 223);
+        rect(x * tileSize, y * tileSize, tileSize, tileSize);
+      
+      } 
+      
     }
   }
 }
@@ -209,9 +228,10 @@ function keyPressed() {
       dialogText = "O mighty administrator, grant me the wisdom to walk the path of a true hero.";
       if (talkSound && talkSound.isLoaded()) talkSound.play();
       // 把 N 变成 <（你原逻辑）
-      const row = map[player.gy - 1].split("");
+      const row = map[player.gy - 2].split("");
       row[player.gx] = "<";
-      map[player.gy - 1] = row.join("");
+      map[player.gy - 2] = row.join("");
+      unlockAchievement("Press ‘E’ to Interact?")
     }
 
 
@@ -308,7 +328,7 @@ function handleContinuousMove() {
   if (ny < 0 || ny >= map.length || nx < 0 || nx >= map[0].length) return;
 
   const tile = map[ny][nx];
-  const blocked = (tile === "#" || tile === "T");
+  const blocked = (tile === "#" || tile === "T"|| tile === "B"|| tile === "R");
   player.dir = newDir;
 
   if (!blocked) {
@@ -324,7 +344,7 @@ function handleContinuousMove() {
      // ✅ 这里添加“第一步”检测
     if (!firstStep) {
       firstStep = true;
-      unlockAchievement("First Step");
+      unlockAchievement("Learning to Walk");
     }
   }
 }
