@@ -1,8 +1,78 @@
-html, body {
+/* 🌿 页面整体样式 */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
   margin: 0;
-  padding: 0;
+  background-color: #5b3a29;
 }
 
 canvas {
-  display: block;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
+
+/* 🏆 成就弹窗样式 */
+#achievement-box {
+  position: fixed;
+  top: 40px;
+  right: -300px; /* 初始隐藏 */
+  background: #3b2f2f;
+  color: #f8e8c0;
+  font-size: 18px;
+  font-family: "Arial", sans-serif;
+  padding: 16px 28px;
+  border-radius: 10px 0 0 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  transition: right 0.8s ease-out;
+  z-index: 9999;
+}
+
+#achievement-box.show {
+  right: 20px; /* 滑入位置 */
+}
+
+/* 📜 永久成就列表 */
+#achievement-list {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 220px;
+  background: rgba(59, 47, 47, 0.85);
+  color: #f8e8c0;
+  font-family: "Arial", sans-serif;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+#achievement-list h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  border-bottom: 1px solid rgba(248, 232, 192, 0.5);
+  padding-bottom: 5px;
+}
+
+#achievement-count {
+  font-weight: normal;
+  font-size: 14px;
+  font-weight: normal;
+  color: rgba(248, 232, 192, 0.9);
+}
+
+/* 🪶 成就条目 */
+#achievement-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#achievement-items li {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+
