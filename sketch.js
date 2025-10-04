@@ -1,41 +1,34 @@
 let maps = [];
 let currentMap = 0;
-let tileSize = 40;
+let tileSize = 50;
 let player = {x: 10, y: 2};
 let dialogText = "";
 let playerImg;
 
-function preload() {
-  playerImg = loadImage('assets/player.png');  
-}
 
-
-//sound
+//sound and image
 let talkSound;
 
 function preload() {
   talkSound = loadSound('assets/kookaburra.wav');  
+  playerImg = loadImage('assets/player.png');  
+  npc1Img = loadImage('assets/npc.png');
 }
 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   maps[0] = [
-    "#############.N.##############",
-    "#............................#",
-    "#............................#",
-    "#............................#",
-    "#............................#",
-    "#............................#",
-    "..............................",
-    "..............................",
-    "..............................",
-    "#............................#",
-    "#............................#",
-    "#............................#",
-    "#............................#",
-    "#............................#",
-    "#############>>>##############"
+    "#########.N.########",
+    "#..................#",
+    "#..................#",
+    "#..................#",
+    "#..................#",
+    "#..................#",
+    "....................",
+    "....................",
+    "....................",
+    "#########>>>########",
   ];
 
   maps[1] = [
@@ -57,7 +50,7 @@ function setup() {
   ];
 
   maps[2] = [
-   "##############################",
+    "##############################",
     "#............................#",
     "#............................#",
     "#............................#",
@@ -76,13 +69,12 @@ function setup() {
 }
 
 function draw() {
-  background(220);
+  background(220, 210, 200, 180);
   drawMap(maps[currentMap]);
 
   // 玩家
  imageMode(CENTER); // 图片中心对齐，角色会居中更自然
- image(
-  playerImg, player.x * tileSize + tileSize / 2, player.y * tileSize + tileSize / 2, tileSize, tileSize)
+ image(playerImg, player.x * tileSize + tileSize / 2, player.y * tileSize + tileSize / 2, tileSize, tileSize)
 
   //对话框
   if (dialogText !== "") {
