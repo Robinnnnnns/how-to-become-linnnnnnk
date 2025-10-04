@@ -15,12 +15,12 @@ let anim = {
 };
 let frameIndex = 1;      // 0/1/2
 let frameTimer = 0;      // 计时器
-const FRAME_INTERVAL = 7; // 每隔多少帧切一次图（数值越小越快）
+const FRAME_INTERVAL = 5; // 每隔多少帧切一次图（数值越小越快）
 // 玩家（网格 + 像素 + 运动状态）
 let player = {
   gx: 10, gy: 5,          // 当前所在格
   px: 10 * tileSize,      // 当前像素位置
-  py: 2  * tileSize,
+  py: 5  * tileSize,
   dir: 'down',
   moving: false,
   startPX: 0, startPY: 0, // 本次移动起点像素
@@ -202,31 +202,10 @@ function drawMap(map) {
 }
 
 function keyPressed() {
-  
-  // 越界保护
-  if (ny < 0 || ny >= map.length || nx < 0 || nx >= map[0].length) return;
+  const map = maps[currentMap];
 
-  const tile = map[ny][nx];
-  const blocked = (tile === "#" || tile === "T"); // T: 树桩一类不可通行
-  if (!blocked) {
-    // 允许移动：更新网格坐标，设置像素目标，启动平滑移动 & 动画
-    player.gx = nx;
-    player.gy = ny;
-
-    player.startPX = player.px;
-    player.startPY = player.py;
-    player.targetPX = player.gx * tileSize;
-    player.targetPY = player.gy * tileSize;
-
-    player.moving = true;
-    // 移动开始时将帧切到 0，显得更有起步感（可选）
-    frameIndex = 0;
- 
-
-
-  // 交互：遇到N
-
- if (player.gy - 1 >= 0 && map[player.gy - 1][player.gx] === "N") {
+  // 例如靠近 NPC 上方触发对话：
+    if (player.gy - 1 >= 0 && map[player.gy - 2][player.gx] === "N") {
       dialogText = "O mighty administrator, grant me the wisdom to walk the path of a true hero.";
       if (talkSound && talkSound.isLoaded()) talkSound.play();
       // 把 N 变成 <（你原逻辑）
@@ -234,39 +213,39 @@ function keyPressed() {
       row[player.gx] = "<";
       map[player.gy - 1] = row.join("");
     }
-  
-  
-}
 
 
-
-
+  // 🎯 检测当前脚下是否为传送点
+  const tile = map[player.gy][player.gx];
   if (tile === ">") {
-  currentMap = 1;
-  player.gx = 2; 
-  player.gy = 2;
+    // 传送到地图1
+    currentMap = 1;
+    player.gx = 2; 
+    player.gy = 2;
 
-  // ✅ 内联对齐
-  player.px = player.gx * tileSize;
-  player.py = player.gy * tileSize;
-  player.targetPX = player.px;
-  player.targetPY = player.py;
-  player.moving = false;
-  frameIndex = 1;
-} 
-else if (tile === "<") {
-  currentMap = 0;
-  player.gx = 2; 
-  player.gy = 6;
+    player.px = player.gx * tileSize;
+    player.py = player.gy * tileSize;
+    player.targetPX = player.px;
+    player.targetPY = player.py;
+    player.moving = false;
+    frameIndex = 1;
 
-  // ✅ 同样直接对齐
-  player.px = player.gx * tileSize;
-  player.py = player.gy * tileSize;
-  player.targetPX = player.px;
-  player.targetPY = player.py;
-  player.moving = false;
-  frameIndex = 1;
+    return; // ✅ 防止同帧继续检测
+  } 
+  else if (tile === "<") {
+    // 传送回地图0
+    currentMap = 0;
+    player.gx = 2; 
+    player.gy = 6;
 
+    player.px = player.gx * tileSize;
+    player.py = player.gy * tileSize;
+    player.targetPX = player.px;
+    player.targetPY = player.py;
+    player.moving = false;
+    frameIndex = 1;
+
+    return; // ✅ 同样避免双触发
   }
 }
 
