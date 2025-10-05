@@ -54,6 +54,9 @@ let appleImg;
 let coopImg;
 let wellImg;
 let flowerImg;
+let ghostImg;
+let swordImg;
+
 
 let firstpage;
 let stonewalk1;
@@ -85,8 +88,13 @@ function preload() {
   coopImg = loadImage('assets/coop.gif');
   wellImg = loadImage('assets/well.gif');
   flowerImg = loadImage('assets/flower.gif');
+  ghostImg = loadImage('assets/ghost.gif');
+  swordImg = loadImage('assets/sword.gif');
+
+
   firstpage = loadImage('assets/firstpage.gif');
   stonewalk1 = loadImage('assets/stonewalk1.gif');
+  stonewalk2 = loadImage('assets/stonewalk2.gif');
   flowerwalk1 = loadImage('assets/flowerwalk1.gif');
   flowerwalk2 = loadImage('assets/flowerwalk2.gif');
 
@@ -129,16 +137,16 @@ function setup() {
   ];
 
   maps[1] = [//> mountain
-     "----------N---------",
-    "1BBBBB.........TTTT1",
-    "1TTT.........B.....1",
-    "1..................1",
-    "<...B...........T..>",
-    "<..................>",
-    "1............BBBBBB1",
-    "1TTTTTT......TRRRRR1",
-    "1BBBBBBBBB...TRRRRR1",
-    "---------->>--------",
+    "BBBBBBBBBBBBBBBBBBBB",
+    "B......%.......%...B",
+    "B.BB.BBB.B..BB.BBB.B",
+    "B.%..B...B...B.%...B",
+    "....BBB.BBB.BBB....B",
+    "B...B.%..B.....B...B",
+    "B.BBBBB.BBB.BB.BB%.B",
+    "B.%..B......B..%...B",
+    "B....BBB.B%.BB.B...B",
+    "BBBBBBBBBBBBBBBBBBBB",
   ];
 
   maps[2] = [//< beach
@@ -197,7 +205,7 @@ function draw() {
     background(220, 210, 200); // 
   } 
   else if (currentMap === 1) {
-    background(180, 210, 250); // 天空蓝
+    background(190, 187, 180); // grey
   } 
   else if (currentMap === 2) {
     background(255, 207, 110); // yellow
@@ -353,9 +361,21 @@ function drawMap(map) {
         imageMode(CENTER);
         image(flowerImg, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
       } 
+      else if (ch === "%") {
+        imageMode(CENTER);
+        image(ghostImg, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
+      } 
+      else if (ch === "&") {
+        imageMode(CENTER);
+        image(swordImg, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
+      } 
       else if (ch === "@") {
         imageMode(CENTER);
         image(stonewalk1, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
+      } 
+       else if (ch === "$") {
+        imageMode(CENTER);
+        image(stonewalk2, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
       } 
       else if (ch === "D") {
         imageMode(CENTER);
@@ -502,7 +522,7 @@ function checkTeleport() {
   };
   
 
-  if (tile === ">") doTeleport(1, 10, 5);
+  if (tile === ">") doTeleport(1, 1, 5);
   else if (tile === "<") doTeleport(2, 18, 5);
   else if (tile === "^") doTeleport(3, 10, 8);
   else if (tile === "!") doTeleport(4, 10, 0);
