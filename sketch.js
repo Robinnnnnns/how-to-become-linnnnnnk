@@ -94,18 +94,18 @@ function setup() {
   maps[0] = [
     
     "----------N---------",
-    "1BBBBB.........TTTT1",
-    "1TTT.........B.....1",
-    "1..................1",
-    "1...B...........T..1",
+    "1BBBBBBBB......TTTT1",
+    "1TTT......TB.B.....1",
+    "1.........TB.......1",
+    "1...B.....T.....T..1",
     "<..................1",
     "1............BBBBBB1",
     "1TTTTTT......TRRRRR1",
     "1BBBBBBBBB...TRRRRR1",
-    "---------->>--------",
+    "----------!---------",
   ];
 
-  maps[1] = [//> mountain
+  maps[1] = [//> mountain暂时没有
      "----------N---------",
     "1BBBBB.........TTTT1",
     "1TTT.........B.....1",
@@ -132,16 +132,16 @@ function setup() {
   ];
 
   maps[3] = [//^ forest
-    "----------N---------",
-    "1BBBBB.........TTTT1",
-    "1TTT.........B.....1",
-    "1..................1",
-    "<...B...........T..1",
-    "<..................1",
-    "1............BBBBBB1",
-    "1TTTTTT......TRRRRR1",
-    "1BBBBBBBBB...TRRRRR1",
-    "---------->>--------",
+    "####################",
+    "####################",
+    "#TTTTTTTTTGTTTTTTTT#",
+    "#TTTTTT.......TTTTT#",
+    "#BBBBB........BBBBB#",
+    "#BBBBBBB.....BBBBBB#",
+    "#RRRRRRB.....BRRRRR#",
+    "#RRRRRRB.....BRRRRR#",
+    "#RRRRRRB.....BRRRRR#",
+    "##########O#########",
   ];
 
    // 初始化像素目标
@@ -217,7 +217,7 @@ function draw() {
   stroke('#FDFBF7');           // ✅ 边框颜色
   strokeWeight(1);       // ✅ 边框粗细（单位：像素）
   fill(0, 150);                // 半透明黑背景
-  rect(20, height - 120, width - 40, 100, 12);
+  rect(20, height - 100, width - 40, 100, 12);
 
   noStroke();  
   
@@ -225,8 +225,9 @@ function draw() {
   fill(255);
   textSize(18);
   textAlign(LEFT, TOP);
-  text(dialogText, 40, height - 110, width - 80, 90); 
+  text(dialogText, 40, height - 90, width - 80, 90); 
 }
+  //
   handleContinuousMove();
 }
 
@@ -279,6 +280,10 @@ function drawMap(map) {
         imageMode(CENTER);
         image(shellImg, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
       } 
+      else if (ch === "G") {
+        imageMode(CENTER);
+        image(npc1Img, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
+      } 
       else if (ch === "R") {
         noStroke();//这里开始没有描边
         fill(64, 164, 223);
@@ -290,19 +295,10 @@ function drawMap(map) {
   }
 }
 
-function keyPressed() {
-  const map = maps[currentMap];
+function keyPressed() {//暂时没有
+ 
 
-  // 例如靠近 NPC 上方触发对话：
-    if (player.gy - 1 >= 0 && map[player.gy - 2][player.gx] === "N") {
-      dialogText = "O mighty administrator, grant me the wisdom to walk the path of a true hero.";
-      if (talkSound && talkSound.isLoaded()) talkSound.play();
-      // 把 N 变成 <（你原逻辑）
-      const row = map[player.gy - 2].split("");
-      row[player.gx] = "^";
-      map[player.gy - 2] = row.join("");
-      unlockAchievement("Press ‘E’ to Interact?")
-    }
+  
   
 
   }
@@ -335,6 +331,10 @@ function unlockAchievement(name) {
   count.textContent = `(${unlockedAchievements.length}/${totalAchievements})`;
 
 }
+
+
+
+
 function handleContinuousMove() {
   // 如果玩家正在移动，就不触发新的移动
   if (player.moving) return;
@@ -366,7 +366,7 @@ function handleContinuousMove() {
   if (ny < 0 || ny >= map.length || nx < 0 || nx >= map[0].length) return;
 
   const tile = map[ny][nx];
-  const blocked = (tile === "#" || tile === "T"|| tile === "B"|| tile === "R"|| tile === "1"|| tile === "-"|| tile === "E"|| tile === "X");//防撞
+  const blocked = (tile === "#" || tile === "T"|| tile === "B"|| tile === "R"|| tile === "1"|| tile === "-"|| tile === "E"|| tile === "X"|| tile === "N"|| tile === "G");//防撞
   player.dir = newDir;
 
   if (!blocked) {
@@ -421,7 +421,7 @@ function checkTeleport() {
 
   if (tile === ">") doTeleport(1, 10, 5);
   else if (tile === "<") doTeleport(2, 18, 5);
-  else if (tile === "^") doTeleport(3, 8, 5);
+  else if (tile === "^") doTeleport(3, 10, 8);
   else if (tile === "O") doTeleport(0, 10, 5);
 }
 
@@ -447,12 +447,56 @@ function mousePressed() {
       if (interactSound && interactSound.isLoaded()) interactSound.play();
 
       // ✅ 解锁成就
-      unlockAchievement("Shell acquired!");
+      unlockAchievement("Shell Acquired!");
 
       // ✅ （可选）改变地图上该 X 的外观，例如让它消失或变成别的符号
       const row = map[ty].split("");
       row[tx] = ".";
       map[ty] = row.join("");
     }
+  }
+
+  if (map[ty][tx] === "N") {
+    // 检查玩家是否在 n 的上下左右一格
+    const adjacent =
+      (player.gx === tx && abs(player.gy - ty) === 1) ||
+      (player.gy === ty && abs(player.gx - tx) === 1);
+
+    if (adjacent) {
+      // ✅ 播放音效
+      if (talkSound && talkSound.isLoaded()) talkSound.play();
+
+      // ✅ 解锁成就
+      dialogText = "O mighty administrator, grant me the wisdom to walk the path of a true hero.";
+      unlockAchievement("Press ‘E’ to Interact?");
+
+      // ✅ （可选）改变地图上的外观，例如让它消失或变成别的符号
+      const row = map[ty].split("");
+      row[tx] = "^";
+      map[ty] = row.join("");
+      setTimeout(() => {
+    dialogText = "";
+  }, 3000);
+    }
+  } 
+  if (map[ty][tx] === "G") {
+    // 检查玩家是否在g的上下左右一格
+    const adjacent =
+      (player.gx === tx && abs(player.gy - ty) === 1) ||
+      (player.gy === ty && abs(player.gx - tx) === 1);
+
+    if (adjacent) {
+      // ✅ 播放音效
+      if (talkSound && talkSound.isLoaded()) talkSound.play();
+
+      // ✅ 解锁成就
+      dialogText = "Find the nine, and your path shall be revealed.";
+      
+      setTimeout(() => {
+    dialogText = "";
+  }, 3000);
+    }
+    
+  
   }
 }
