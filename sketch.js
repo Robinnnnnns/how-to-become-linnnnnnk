@@ -56,6 +56,8 @@ let wellImg;
 let flowerImg;
 let ghostImg;
 let swordImg;
+let stoneImg;
+
 
 
 let firstpage;
@@ -90,6 +92,7 @@ function preload() {
   flowerImg = loadImage('assets/flower.gif');
   ghostImg = loadImage('assets/ghost.gif');
   swordImg = loadImage('assets/sword.gif');
+  stoneImg = loadImage('assets/stone1.gif');
 
 
   firstpage = loadImage('assets/firstpage.gif');
@@ -136,17 +139,17 @@ function setup() {
     "----------!---------",
   ];
 
-  maps[1] = [//> mountain
-    "BBBBBBBBBBBBBBBBBBBB",
-    "B......%.......%...B",
-    "B.BB.BBB.B..BB.BBB.B",
-    "B.%..B...B...B.%...B",
-    "....BBB.BBB.BBB....B",
-    "B...B.%..B.....B...B",
-    "B.BBBBB.BBB.BB.BB%.B",
-    "B.%..B......B..%...B",
-    "B....BBB.B%.BB.B...B",
-    "BBBBBBBBBBBBBBBBBBBB",
+  maps[1] = [//> mine $
+  "JJJJJJJJJJJJJJJJJJJJ",
+  "J%...$.$$%..JJ..$$JJ",
+  "J$$JJJJJ....JJ.JJ.JJ",
+  "J.%$$JJ..JJ$$..%..JJ",
+  "J$.$JJJ$JJJ.JJJJJ..J",
+  "$$%.J.%$.JJ..$$JJ.HO",
+  "J$JJJJ.J.JJ.JJ.JJ%.J",
+  "J$%..$$$.J.$.J.$$$JJ",
+  "J$$$%JJJ.$.%.$.J%.JJ",
+  "JJJJJJJJJJJJJJJJJJJJ",
   ];
 
   maps[2] = [//< beach
@@ -205,7 +208,7 @@ function draw() {
     background(220, 210, 200); // 
   } 
   else if (currentMap === 1) {
-    background(190, 187, 180); // grey
+    background(230, 225, 215); // grey
   } 
   else if (currentMap === 2) {
     background(255, 207, 110); // yellow
@@ -365,9 +368,13 @@ function drawMap(map) {
         imageMode(CENTER);
         image(ghostImg, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
       } 
-      else if (ch === "&") {
+      else if (ch === "H") {
         imageMode(CENTER);
         image(swordImg, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
+      } 
+      else if (ch === "J") {
+        imageMode(CENTER);
+        image(stoneImg, x * tileSize + tileSize/2, y * tileSize + tileSize/2, tileSize, tileSize);
       } 
       else if (ch === "@") {
         imageMode(CENTER);
@@ -469,7 +476,7 @@ function handleContinuousMove() {
   if (ny < 0 || ny >= map.length || nx < 0 || nx >= map[0].length) return;
 
   const tile = map[ny][nx];
-  const blocked = (tile === "#" || tile === "T"|| tile === "B"|| tile === "R"|| tile === "1"|| tile === "-"|| tile === "E"|| tile === "X"|| tile === "N"|| tile === "G"|| tile === "A"|| tile === "C"|| tile === "P"|| tile === "W"|| tile === "F");//防撞
+  const blocked = (tile === "#" || tile === "T"|| tile === "B"|| tile === "R"|| tile === "1"|| tile === "-"|| tile === "E"|| tile === "X"|| tile === "N"|| tile === "G"|| tile === "A"|| tile === "C"|| tile === "P"|| tile === "W"|| tile === "F"|| tile === "J"|| tile === "H");//防撞
   player.dir = newDir;
 
   if (!blocked) {
@@ -527,6 +534,7 @@ function checkTeleport() {
   else if (tile === "^") doTeleport(3, 10, 8);
   else if (tile === "!") doTeleport(4, 10, 0);
   else if (tile === "O") doTeleport(0, 10, 5);
+  else if (tile === "%") doTeleport(1, 1, 5);
 }
 
 function mousePressed() {
@@ -600,7 +608,7 @@ function mousePressed() {
   }
   // 检测点击的格子是不是 f
   if (map[ty][tx] === "F") {
-    // 检查玩家是否在 X 的上下左右一格
+    // 检查玩家是否在 F 的上下左右一格
     const adjacent =
       (player.gx === tx && abs(player.gy - ty) === 1) ||
       (player.gy === ty && abs(player.gx - tx) === 1);
@@ -618,6 +626,28 @@ function mousePressed() {
       map[ty] = row.join("");
     }
   }
+  // 检测点击的格子是不是 H
+  if (map[ty][tx] === "H") {
+    // 检查玩家是否在 H 的上下左右一格
+    const adjacent =
+      (player.gx === tx && abs(player.gy - ty) === 1) ||
+      (player.gy === ty && abs(player.gx - tx) === 1);
+
+    if (adjacent) {
+      // ✅ 播放音效
+      if (interactSound && interactSound.isLoaded()) interactSound.play();
+
+      // ✅ 解锁成就
+      unlockAchievement("Time to Break Pots ");
+
+      // ✅ （可选）改变地图上该 X 的外观，例如让它消失或变成别的符号
+      const row = map[ty].split("");
+      row[tx] = ".";
+      map[ty] = row.join("");
+    }
+  }
+  
+  
 
   if (map[ty][tx] === "N") {
     // 检查玩家是否在 n 的上下左右一格
