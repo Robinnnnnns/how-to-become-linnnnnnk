@@ -42,6 +42,7 @@ let player = {
 let talkSound;
 let achievementSound;
 let interactSound;
+let ghostSound;
 
 let playerImg;
 let npc1Img;
@@ -80,6 +81,7 @@ function preload() {
   talkSound = loadSound('assets/achievement.mp3');  
   achievementSound = loadSound('assets/interaction.mp3');
   interactSound = loadSound('assets/interaction.mp3');
+  ghostSound = loadSound('assets/talking.mp3');
   npc1Img = loadImage('assets/stone.gif');
   wallImg = loadImage('assets/wall.gif');
   treeImg = loadImage('assets/stump.gif');
@@ -742,7 +744,12 @@ function checkTeleport() {
   else if (tile === "^") doTeleport(3, 10, 8);
   else if (tile === "!") doTeleport(4, 10, 1);
   else if (tile === "O") doTeleport(0, 10, 5);
-  else if (tile === "%") doTeleport(1, 1, 5);//ghost
+  else if (tile === "%") {
+  if (ghostSound && ghostSound.isLoaded()) {
+    ghostSound.play(); // 播放幽灵传送音效
+  }
+  doTeleport(1, 1, 5); //  执行传送
+}//ghost
 }
 
 function mousePressed() {
