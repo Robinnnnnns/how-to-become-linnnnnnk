@@ -891,7 +891,7 @@ function mousePressed() {
         "Yes... I’m.",
         "Linnnnnnk: So... I guess this is the end, huh?",
         "Yes.",
-        "Linnnnnnk: It’s just... I don’t know, something feels a little strange. I mean, I thought I’d get to see you. You know, you’d give me a halo or something— like a hero’s mark, with flowers and ribbons and all that…",
+        "Linnnnnnk: It’s just... I don’t know, something feels a little strange. I mean, I thought you’d give me a halo or something— like a hero’s emblem, with flowers and ribbons and all that…",
         "Linnnnnnk: Is that a silly thought? And this forest... It’s not quite what I imagined either. I thought it would be bigger... and brighter.",
         "Linnnnnnk: So... what am I supposed to do after becoming a hero?"
       ]);
