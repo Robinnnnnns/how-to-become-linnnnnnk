@@ -616,6 +616,14 @@ function unlockAchievement(name) {
   if (achievementSound && achievementSound.isLoaded()) {
     achievementSound.play();
   }
+  //inverntory
+  const slots = document.querySelectorAll('.inventory-bar .slot');
+  const idx = unlockedAchievements.length - 1;
+  if (slots[idx]) {
+    slots[idx].classList.add('lit');
+    // 如果你想直接在格子里显示图标而不是用 ::after
+    // slots[idx].textContent = "★";
+  }
 
   
   // 显示弹窗
@@ -633,6 +641,8 @@ function unlockAchievement(name) {
     hasAllAchievements = true;
     box.textContent = "🌟 All Achievements Unlocked!";
     setTimeout(() => box.classList.remove('show'), 3000);
+
+  
   }  
 
 
