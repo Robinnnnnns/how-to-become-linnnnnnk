@@ -6,6 +6,7 @@ let firstTeleportUnlocked = false; // 全局变量
 let firstBesideE = false; // 全局标记，只触发一次
 let overlayUntil = 0; // 毫秒时间戳：在此时间前显示遮盖
 let hasAllAchievements = false;//9/9成就
+let gDialogPlayed = false;
 
 //dialog q
 let dialogQueue = null;
@@ -413,6 +414,10 @@ function drawMap(map) {
 function keyPressed() {
   //同鼠标点击
   if (key === ' ' || keyCode === 32) {
+    if (isDialogActive && isDialogActive()) {
+      nextDialog && nextDialog();
+      return false; // 防止空格滚屏
+    }
 
     const map = maps[currentMap];
     // 关键：从 player 里取 gx/gy
@@ -568,6 +573,7 @@ function keyPressed() {
       // 播放音效
       if (talkSound && talkSound.isLoaded()) talkSound.play();
       if (hasAllAchievements === true) {
+        if (!gDialogPlayed) {
        startDialog([
         "Linnnnnnk: Finally... Where is this...? Is this the forest? It’s so empty here — I thought there’d be, like, a path to the castle or something. Hello? Anyone here?",
         "Yes... I’m here.",
@@ -579,8 +585,9 @@ function keyPressed() {
         "Linnnnnnk: Is that a silly thought? And this forest... It’s not quite what I imagined either. I thought it would be bigger... and brighter.",
         "Linnnnnnk: So... what am I supposed to do after becoming a hero?"
       ]);
+      gDialogPlayed = true;
     }
-
+  }
      
     // 否则显示原始提示
       else {
@@ -591,7 +598,8 @@ function keyPressed() {
     }
     }
   }
-  }
+  
+}
   }
   }
 
