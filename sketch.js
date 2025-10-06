@@ -1,4 +1,4 @@
-const totalAchievements = 9; // ✅ 你可以根据实际成就数量改
+const totalAchievements = 9; // 根据实际成就数量改
 let unlockedAchievements = [];
 
 let teleportLock = false; // 防抖，避免同帧/连续传送
@@ -135,7 +135,7 @@ function setup() {
     "----------N---------",
     "1BBBBBBBB.@.BBBBBBB1",
     "1...PC...T@T....CTT1",
-    "1........T@T..C....1",
+    "1........T@T.C.....1",
     "1P.C.T.CPT@T....TTT1",
     "<@@@@@@@@@@@@@@@@@@>",
     "1C.......W@.C------1",
@@ -158,13 +158,13 @@ function setup() {
   ];
 
   maps[2] = [//< beach
-    "SSSE***.X&..*..&&..O",
+    "SSSE***.&X..*..&&..O",
     "SSSE.X..&&&..X.....O",
-    "SSSE&&..X...&...*..O",
+    "SSSE&&......&...*..O",
     "SSSEX..*.*...&...*.O",
-    "SSSSE&&.&&....*&*..O",
+    "SSSSE&&.X&.*..*&*..O",
     "SSSSE*&**...&...*&*O",
-    "SSSSSSSSE&*..X.....O",
+    "SSSSSSSSE&*.X......O",
     "SSSSSSSSSSE*&&*X...O",
     "SSSSSSSSSSSSSSE&**.O",
     "SSSSSSSSSSSSSSSSSSEO",
@@ -410,12 +410,189 @@ function drawMap(map) {
   }
 }
 
-function keyPressed() {//暂时没有
- 
+function keyPressed() {
+  //同鼠标点击
+  if (key === ' ' || keyCode === 32) {
+
+    const map = maps[currentMap];
+    // 关键：从 player 里取 gx/gy
+    const gx = player.gx;
+    const gy = player.gy;
+    // 检查玩家上下左右一格
+    const positions = [
+      [gy - 1, gx],
+      [gy + 1, gx],
+      [gy, gx - 1],
+      [gy, gx + 1]
+    ];
+
+    for (let i = 0; i < positions.length; i++) {
+      const [ty, tx] = positions[i];
+
+      // 越界保护
+      if (ty < 0 || ty >= map.length || tx < 0 || tx >= map[0].length) continue;
+
+      // 检测点击的格子是不是 X
+  if (map[ty][tx] === "X") {
+    // 检查玩家是否在 X 的上下左右一格
+    const adjacent =
+      (player.gx === tx && abs(player.gy - ty) === 1) ||
+      (player.gy === ty && abs(player.gx - tx) === 1);
+
+    if (adjacent) {
+      // 播放音效
+      if (interactSound && interactSound.isLoaded()) interactSound.play();
+
+      // 解锁成就
+      unlockAchievement("I got a shell!");
+
+      // （可选）改变地图上该 X 的外观，例如让它消失或变成别的符号
+      const row = map[ty].split("");
+      row[tx] = ".";
+      map[ty] = row.join("");
+    }
+  }
+  // 检测点击的格子是不是 A
+  if (map[ty][tx] === "A") {
+    // 检查玩家是否在 X 的上下左右一格
+    const adjacent =
+      (player.gx === tx && abs(player.gy - ty) === 1) ||
+      (player.gy === ty && abs(player.gx - tx) === 1);
+
+    if (adjacent) {
+      // 播放音效
+      if (interactSound && interactSound.isLoaded()) interactSound.play();
+
+      // 解锁成就
+      unlockAchievement("???");
+
+      // 改变地图上该 X 的外观，例如让它消失或变成别的符号
+      const row = map[ty].split("");
+      row[tx] = ".";
+      map[ty] = row.join("");
+    }
+  }
+
+  // 检测点击的格子是不是 C
+  if (map[ty][tx] === "C") {
+    // 检查玩家是否在 C 的上下左右一格
+    const adjacent =
+      (player.gx === tx && abs(player.gy - ty) === 1) ||
+      (player.gy === ty && abs(player.gx - tx) === 1);
+
+    if (adjacent) {
+      // 播放音效
+      if (interactSound && interactSound.isLoaded()) interactSound.play();
+
+      // 解锁成就
+      overlayUntil = millis() + 1000;
+      unlockAchievement("Hero of the Coop");
+  
+      
+    }
+  }
+  // 检测点击的格子是不是 f
+  if (map[ty][tx] === "F") {
+    // 检查玩家是否在 F 的上下左右一格
+    const adjacent =
+      (player.gx === tx && abs(player.gy - ty) === 1) ||
+      (player.gy === ty && abs(player.gx - tx) === 1);
+
+    if (adjacent) {
+      // 播放音效
+      if (interactSound && interactSound.isLoaded()) interactSound.play();
+
+      // 解锁成就
+      unlockAchievement("Picked a Tiny Blossom");
+
+      // （可选）改变地图上该 X 的外观，例如让它消失或变成别的符号
+      const row = map[ty].split("");
+      row[tx] = ".";
+      map[ty] = row.join("");
+    }
+  }
+  // 检测点击的格子是不是 H
+  if (map[ty][tx] === "H") {
+    // 检查玩家是否在 H 的上下左右一格
+    const adjacent =
+      (player.gx === tx && abs(player.gy - ty) === 1) ||
+      (player.gy === ty && abs(player.gx - tx) === 1);
+
+    if (adjacent) {
+      // 播放音效
+      if (interactSound && interactSound.isLoaded()) interactSound.play();
+
+      //  解锁成就
+      unlockAchievement("Time to Break Pots ");
+
+      // （可选）改变地图上该 X 的外观，例如让它消失或变成别的符号
+      const row = map[ty].split("");
+      row[tx] = ".";
+      map[ty] = row.join("");
+    }
+  }
 
   
-  
 
+  if (map[ty][tx] === "N") {
+    // 检查玩家是否在 n 的上下左右一格
+    const adjacent =
+      (player.gx === tx && abs(player.gy - ty) === 1) ||
+      (player.gy === ty && abs(player.gx - tx) === 1);
+
+    if (adjacent) {
+      // 播放音效
+      if (talkSound && talkSound.isLoaded()) talkSound.play();
+
+      // 解锁成就
+      dialogText = "O mighty administrator, grant me the wisdom to walk the path of a true hero.";
+      
+      unlockAchievement("Press ‘E’ to Interact?");
+
+      // （可选）改变地图上的外观，例如让它消失或变成别的符号
+      const row = map[ty].split("");
+      row[tx] = "^";
+      map[ty] = row.join("");
+      setTimeout(() => {
+    dialogText = "";
+  }, 3000);
+    }
+  } 
+  if (map[ty][tx] === "G") {
+    // 检查玩家是否在g的上下左右一格
+    const adjacent =
+      (player.gx === tx && abs(player.gy - ty) === 1) ||
+      (player.gy === ty && abs(player.gx - tx) === 1);
+
+    if (adjacent) {
+      // 播放音效
+      if (talkSound && talkSound.isLoaded()) talkSound.play();
+      if (hasAllAchievements === true) {
+       startDialog([
+        "Linnnnnnk: Finally... Where is this...? Is this the forest? It’s so empty here — I thought there’d be, like, a path to the castle or something. Hello? Anyone here?",
+        "Yes... I’m here.",
+        "Linnnnnnk: !!! Who are you!? Wait— are you administrator?!",
+        "Yes... I’m.",
+        "Linnnnnnk: So... I guess this is the end, huh?",
+        "Yes.",
+        "Linnnnnnk: It’s just... I don’t know, something feels a little strange. I mean, I thought I’d get to see you. You know, you’d give me a halo or something— like a hero’s mark, with flowers and ribbons and all that…",
+        "Linnnnnnk: Is that a silly thought? And this forest... It’s not quite what I imagined either. I thought it would be bigger... and brighter.",
+        "Linnnnnnk: So... what am I supposed to do after becoming a hero?"
+      ]);
+    }
+
+     
+    // 否则显示原始提示
+      else {
+      dialogText = "Find the nine, and your path shall be revealed.";
+      setTimeout(() => {
+      dialogText = "";
+    }, 3000);
+    }
+    }
+  }
+  }
+  }
   }
 
 function unlockAchievement(name) {
