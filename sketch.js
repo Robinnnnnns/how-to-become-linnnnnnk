@@ -5,7 +5,12 @@ let teleportLock = false; // 防抖，避免同帧/连续传送
 let firstTeleportUnlocked = false; // 全局变量
 let firstBesideE = false; // 全局标记，只触发一次
 let overlayUntil = 0; // 毫秒时间戳：在此时间前显示遮盖
+let hasAllAchievements = false;//9/9成就
 
+//dialog q
+let dialogQueue = null;
+let dialogPtr = -1;
+let onDialogEnd = null;
 
 let maps = [];
 let currentMap = 0;
@@ -129,23 +134,23 @@ function setup() {
     
     "----------N---------",
     "1BBBBBBBB.@.BBBBBBB1",
-    "1PCC......@.....CTT1",
-    "1.........@B..C....1",
-    "1P.C.B...T@.....TTT1",
+    "1...PC...T@T....CTT1",
+    "1........T@T..C....1",
+    "1P.C.T.CPT@T....TTT1",
     "<@@@@@@@@@@@@@@@@@@>",
-    "1C........@.CBBBBBB1",
-    "1TW.......@..TRRRRR1",
-    "1BTBBBBBBB@.WTRRRRR1",
+    "1C.......W@.C------1",
+    "1TTTTTT...@..1RRRRR1",
+    "1BBBBBBBBB@.W1RRRRR1",
     "----------!---------",
   ];
 
   maps[1] = [//> mine $
   "JJJJJJJJJJJJJJJJJJJJ",
-  "J%...$.$$%..JJ..$$JJ",
-  "J$$JJJJJ....JJ.JJ.JJ",
-  "J.%$$JJ..JJ$$..%..JJ",
-  "J$.$JJJ$JJJ.JJJJJ..J",
-  "$$%.J.%$.JJ..$$JJ.HO",
+  "J%...$.$$%.$JJ..$$JJ",
+  "J$$JJJJJ...$JJ.JJ.JJ",
+  "J.%$$JJ..JJ$$..%.$JJ",
+  "J$.$JJJ$JJJ.JJJJJ$.J",
+  "O$%.J.%$.JJ..$$JJ$HO",
   "J$JJJJ.J.JJ.JJ.JJ%.J",
   "J$%..$$$.J.$.J.$$$JJ",
   "J$$$%JJJ.$.%.$.J%.JJ",
@@ -178,15 +183,15 @@ function setup() {
     "##########O#########",
   ];
   maps[4] = [//! grasslandmaze
-    "BBBBBBBBBB.BBBBBBBBB",
+    "BBBBBBBBBBOBBBBBBBBB",
     "BDL.L.BLLL.LL.LL#.DB",
     "B.TTT.B.BBBBBBBBLL.B",
     "B.TF..BL.LLL.LB.DBBB",
     "B.TTT..LTTTTT.BD.B.B",
     "BL..L.B.LL.T.LL..L.B",
-    "BBBBBBBBBB.TTTTTTT.B",
+    "BBBBBBBBBB.TTTTTTTFB",
     "BDD#DDB.L.LBLLDDDBLB",
-    "BDBBBBB.BBBBBBBBBB.B",
+    "BDBBBBBFBBBBBBBBBB.B",
     "BDDDDDD#DDDDDDDDDOOB",
     
 
@@ -248,7 +253,7 @@ function draw() {
   player.moving = false;
   frameIndex = 1;
 
-  // ✅ 到达网格中心后立刻检查是否传送
+  // 到达网格中心后立刻检查是否传送
   checkTeleport();
 } else {
   // 移动中更新动画帧...
@@ -265,8 +270,8 @@ function draw() {
 
   //对话框
   if (dialogText !== "") {
-  stroke('#FDFBF7');           // ✅ 边框颜色
-  strokeWeight(1);       // ✅ 边框粗细（单位：像素）
+  stroke('#FDFBF7');           // 边框颜色
+  strokeWeight(1);       // 边框粗细（单位：像素）
   fill(0, 150);                // 半透明黑背景
   rect(20, height - 100, width - 40, 100, 12);
 
@@ -414,7 +419,7 @@ function keyPressed() {//暂时没有
   }
 
 function unlockAchievement(name) {
-  // ✅ 如果重复解锁，不再添加
+  // 如果重复解锁，不再添加
   if (unlockedAchievements.includes(name)) return;
   unlockedAchievements.push(name);
 
@@ -422,23 +427,31 @@ function unlockAchievement(name) {
   const list = document.getElementById('achievement-items');
   const count = document.getElementById('achievement-count');
 
-   // ✅ 播放成就音效（确保已加载）
+   // 播放成就音效
   if (achievementSound && achievementSound.isLoaded()) {
     achievementSound.play();
   }
 
   
-  // ✅ 显示弹窗
+  // 显示弹窗
   box.textContent = `🏆 Achievement Unlocked：${name}`;
   box.classList.add('show');
   setTimeout(() => box.classList.remove('show'), 3000);
 
-  // ✅ 添加到右下角的成就列表
+  // 添加到右下角的成就列表
   const li = document.createElement('li');
   li.textContent = `🏆 ${name}`;
   list.appendChild(li);
-   // ✅ 更新 (n/9)
+   // 更新 (n/9)
   count.textContent = `(${unlockedAchievements.length}/${totalAchievements})`;
+  if (!hasAllAchievements && unlockedAchievements.length >= totalAchievements) {
+    hasAllAchievements = true;
+    box.textContent = "🌟 All Achievements Unlocked!";
+    setTimeout(() => box.classList.remove('show'), 3000);
+  }  
+
+
+
 
 }
 
@@ -453,7 +466,7 @@ function handleContinuousMove() {
   let ny = player.gy;
   let newDir = player.dir;
 
-  // ✅ 支持方向键和 WASD
+  // 支持方向键和 WASD
   if (keyIsDown(LEFT_ARROW) || keyIsDown(65))  { // 65 = 'A'
     nx--;
     newDir = 'left';
@@ -476,7 +489,7 @@ function handleContinuousMove() {
   if (ny < 0 || ny >= map.length || nx < 0 || nx >= map[0].length) return;
 
   const tile = map[ny][nx];
-  const blocked = (tile === "#" || tile === "T"|| tile === "B"|| tile === "R"|| tile === "1"|| tile === "-"|| tile === "E"|| tile === "X"|| tile === "N"|| tile === "G"|| tile === "A"|| tile === "C"|| tile === "P"|| tile === "W"|| tile === "F"|| tile === "J"|| tile === "H");//防撞
+  const blocked = (tile === "#" || tile === "T"|| tile === "B"|| tile === "R"|| tile === "1"|| tile === "-"|| tile === "E"|| tile === "X"|| tile === "N"|| tile === "G"|| tile === "A"|| tile === "C"|| tile === "P"|| tile === "W"|| tile === "F"|| tile === "J"|| tile === "H"|| tile === "S");//防撞
   player.dir = newDir;
 
   if (!blocked) {
@@ -489,7 +502,7 @@ function handleContinuousMove() {
     player.moving = true;
     frameIndex = 0;
 
-     // ✅ 这里添加“第一步”检测
+     // 这里添加“第一步”检测
     if (!firstStep) {
       firstStep = true;
       unlockAchievement("Learning to Walk");
@@ -515,7 +528,7 @@ function checkTeleport() {
     player.moving = false;
     frameIndex = 1;
 
-    // ✅ 第一次传送时解锁成就
+    // 第一次传送时解锁成就
     if (!firstTeleportUnlocked) {
       unlockAchievement("Leaving Home");
       firstTeleportUnlocked = true;
@@ -532,14 +545,17 @@ function checkTeleport() {
   if (tile === ">") doTeleport(1, 1, 5);
   else if (tile === "<") doTeleport(2, 18, 5);
   else if (tile === "^") doTeleport(3, 10, 8);
-  else if (tile === "!") doTeleport(4, 10, 0);
+  else if (tile === "!") doTeleport(4, 10, 1);
   else if (tile === "O") doTeleport(0, 10, 5);
-  else if (tile === "%") doTeleport(1, 1, 5);
+  else if (tile === "%") doTeleport(1, 1, 5);//ghost
 }
 
 function mousePressed() {
   const map = maps[currentMap];
-  
+   if (isDialogActive()) {
+    nextDialog();
+    return;
+  }
   // 鼠标坐标转为网格坐标
   const tx = floor(mouseX / tileSize);
   const ty = floor(mouseY / tileSize);
@@ -555,13 +571,13 @@ function mousePressed() {
       (player.gy === ty && abs(player.gx - tx) === 1);
 
     if (adjacent) {
-      // ✅ 播放音效
+      // 播放音效
       if (interactSound && interactSound.isLoaded()) interactSound.play();
 
-      // ✅ 解锁成就
+      // 解锁成就
       unlockAchievement("I got a shell!");
 
-      // ✅ （可选）改变地图上该 X 的外观，例如让它消失或变成别的符号
+      // （可选）改变地图上该 X 的外观，例如让它消失或变成别的符号
       const row = map[ty].split("");
       row[tx] = ".";
       map[ty] = row.join("");
@@ -575,13 +591,13 @@ function mousePressed() {
       (player.gy === ty && abs(player.gx - tx) === 1);
 
     if (adjacent) {
-      // ✅ 播放音效
+      // 播放音效
       if (interactSound && interactSound.isLoaded()) interactSound.play();
 
-      // ✅ 解锁成就
+      // 解锁成就
       unlockAchievement("???");
 
-      // ✅ （可选）改变地图上该 X 的外观，例如让它消失或变成别的符号
+      // 改变地图上该 X 的外观，例如让它消失或变成别的符号
       const row = map[ty].split("");
       row[tx] = ".";
       map[ty] = row.join("");
@@ -596,10 +612,10 @@ function mousePressed() {
       (player.gy === ty && abs(player.gx - tx) === 1);
 
     if (adjacent) {
-      // ✅ 播放音效
+      // 播放音效
       if (interactSound && interactSound.isLoaded()) interactSound.play();
 
-      // ✅ 解锁成就
+      // 解锁成就
       overlayUntil = millis() + 1000;
       unlockAchievement("Hero of the Coop");
   
@@ -614,13 +630,13 @@ function mousePressed() {
       (player.gy === ty && abs(player.gx - tx) === 1);
 
     if (adjacent) {
-      // ✅ 播放音效
+      // 播放音效
       if (interactSound && interactSound.isLoaded()) interactSound.play();
 
-      // ✅ 解锁成就
+      // 解锁成就
       unlockAchievement("Picked a Tiny Blossom");
 
-      // ✅ （可选）改变地图上该 X 的外观，例如让它消失或变成别的符号
+      // （可选）改变地图上该 X 的外观，例如让它消失或变成别的符号
       const row = map[ty].split("");
       row[tx] = ".";
       map[ty] = row.join("");
@@ -634,13 +650,13 @@ function mousePressed() {
       (player.gy === ty && abs(player.gx - tx) === 1);
 
     if (adjacent) {
-      // ✅ 播放音效
+      // 播放音效
       if (interactSound && interactSound.isLoaded()) interactSound.play();
 
-      // ✅ 解锁成就
+      //  解锁成就
       unlockAchievement("Time to Break Pots ");
 
-      // ✅ （可选）改变地图上该 X 的外观，例如让它消失或变成别的符号
+      // （可选）改变地图上该 X 的外观，例如让它消失或变成别的符号
       const row = map[ty].split("");
       row[tx] = ".";
       map[ty] = row.join("");
@@ -656,14 +672,15 @@ function mousePressed() {
       (player.gy === ty && abs(player.gx - tx) === 1);
 
     if (adjacent) {
-      // ✅ 播放音效
+      // 播放音效
       if (talkSound && talkSound.isLoaded()) talkSound.play();
 
-      // ✅ 解锁成就
+      // 解锁成就
       dialogText = "O mighty administrator, grant me the wisdom to walk the path of a true hero.";
+      
       unlockAchievement("Press ‘E’ to Interact?");
 
-      // ✅ （可选）改变地图上的外观，例如让它消失或变成别的符号
+      // （可选）改变地图上的外观，例如让它消失或变成别的符号
       const row = map[ty].split("");
       row[tx] = "^";
       map[ty] = row.join("");
@@ -679,19 +696,39 @@ function mousePressed() {
       (player.gy === ty && abs(player.gx - tx) === 1);
 
     if (adjacent) {
-      // ✅ 播放音效
+      // 播放音效
       if (talkSound && talkSound.isLoaded()) talkSound.play();
+      if (hasAllAchievements === true) {
+       startDialog([
+        "Linnnnnnk: Finally... Where is this...? Is this the forest? It’s so empty here — I thought there’d be, like, a path to the castle or something. Hello? Anyone here?",
+        "Yes... I’m here.",
+        "Linnnnnnk: !!! Who are you!? Wait— are you administrator?!",
+        "Yes... I’m.",
+        "Linnnnnnk: So... I guess this is the end, huh?",
+        "Yes.",
+        "Linnnnnnk: It’s just... I don’t know, something feels a little strange. I mean, I thought I’d get to see you. You know, you’d give me a halo or something— like a hero’s mark, with flowers and ribbons and all that…",
+        "Linnnnnnk: Is that a silly thought? And this forest... It’s not quite what I imagined either. I thought it would be bigger... and brighter.",
+        "Linnnnnnk: So... what am I supposed to do after becoming a hero?"
+      ]);
 
-      // ✅ 解锁成就
+    } 
+    // 否则显示原始提示
+      else {
       dialogText = "Find the nine, and your path shall be revealed.";
-      
       setTimeout(() => {
-    dialogText = "";
-  }, 3000);
+      dialogText = "";
+    }, 3000);
+    }
+
+      
+
+  
+    
     }
     
   
   }
+  
 }
 
 function checkBeside() {
@@ -704,6 +741,36 @@ function checkBeside() {
   // 检查玩家格是否是 E
   if (x + 1 < map[0].length && map[y][x - 1] === 'E') {
     unlockAchievement("Sea Gazer");
-    firstBesideE = true; // ✅ 标记已触发
+    firstBesideE = true; //  标记已触发
   }
+}
+
+
+// 开始一串对话
+function startDialog(lines, endCb = null) {
+  dialogQueue = lines;
+  dialogPtr = 0;
+  onDialogEnd = endCb || null;
+  dialogText = dialogQueue[dialogPtr];
+}
+
+// 推进到下一句
+function nextDialog() {
+  if (!dialogQueue) return;
+
+  dialogPtr++;
+  if (dialogPtr >= dialogQueue.length) {
+    // 结束
+    dialogQueue = null;
+    dialogPtr = -1;
+    dialogText = "";
+    if (onDialogEnd) onDialogEnd();
+  } else {
+    dialogText = dialogQueue[dialogPtr];
+  }
+}
+
+// 判断是否正在对话
+function isDialogActive() {
+  return dialogQueue !== null;
 }
