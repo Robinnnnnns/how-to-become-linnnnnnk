@@ -9,7 +9,7 @@
 * robinnnnnns: In charge of p5.js programming and level design.
 * soysauceovo: In charge of sound design and artwork.
 
-Actually, two of us had to take cross-continental flights within those three days, so it was an intense and unforgettable experience and a memory we’ll never forget.
+Actually, two of us had to take cross-continental flights within those three days, so it was an intense and unforgettable experience we’ll never forget.
 
 
 
