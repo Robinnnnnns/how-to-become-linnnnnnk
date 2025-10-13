@@ -3,6 +3,8 @@
 
 **It’s not the treasures that make a hero — it’s the stories they walk through.**
 
+This is a small and cozy top-down, tile-based web game inspired by classic adventure titles, but the quest has been turned inside out.
+
 ![how to become linnnnnnk](assets/2.png)
 
 * Suetex: In charge of the original concept, story writing, and artwork.
